@@ -1,7 +1,3 @@
-// script.js (精简后的版本)
-
-// -------------------核心功能函数 (无需改变)-------------------
-
 // 数值调整函数
 function adjustValue(targetId, delta) {
     const input = document.getElementById(targetId);
@@ -44,9 +40,6 @@ function preventNegative(e) {
     return true;
 }
 
-
-// -------------------事件监听 (精简部分)-------------------
-
 // 为所有输入框添加通用监听
 document.querySelectorAll('input[type="number"]').forEach(input => {
     // 实时输入时重新计算
@@ -62,7 +55,6 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
     // 阻止输入负号
     input.addEventListener('keydown', preventNegative);
 });
-
 
 // **【推荐】使用事件委托处理所有按钮点击**
 document.querySelector('.container').addEventListener('click', (e) => {
@@ -83,7 +75,6 @@ document.querySelector('.container').addEventListener('click', (e) => {
         adjustValue(input.id, delta);
     }
 });
-
 
 // -------------------初始化-------------------
 // 页面加载后立即执行一次计算
