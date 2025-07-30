@@ -79,3 +79,11 @@ document.querySelector('.container').addEventListener('click', (e) => {
 // -------------------初始化-------------------
 // 页面加载后立即执行一次计算
 calculate();
+// 设置焦点到inputA输入框并全选内容
+setTimeout(() => {
+    const inputA = document.getElementById('inputA');
+    if (inputA) {
+        inputA.focus();
+        inputA.select();
+    }
+}, 10);
