@@ -1,14 +1,14 @@
-/**
- * UserScript 用于增强 smis.club 交易页面的显示效果
- * @name         挂刀页面美化
- * @namespace    https://github.com/vicoho/Steam-Market-Calculator
- * @version      0.77
- * @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
- * @author       vicoho
- * @run-at       document-end
- * @match        https://smis.club/exchange
- * @grant        none
- */
+// ==UserScript==
+// @name         挂刀页面美化
+// @namespace    https://github.com/vicoho/Steam-Market-Calculator
+// @version      0.77
+// @description  用于增强 smis.club 交易页面的显示效果
+// @author       vicoho
+// @run-at       document-end
+// @match        https://smis.club/exchange
+// @grant        none
+// ==/UserScript==
+
 (function () {
     // 常量定义
     const VOLUME_THRESHOLD = 30; // 日成交量阈值
