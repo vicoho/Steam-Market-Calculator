@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.70
+// @version      0.71
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -11,7 +11,8 @@
 
 (function () {
     // 常量定义
-    const VOLUME_THRESHOLD = 30; // 日成交量阈值
+    const VOLUME_THRESHOLD = 30; // 日成交量阈值（紫色）
+    const HIGH_VOLUME_THRESHOLD = 80; // 高成交量阈值（红色）
 
     // 美化页面的 CSS 样式
     const cssStyles = `
@@ -88,9 +89,14 @@
                 const volumeText = span.textContent.trim();
                 const dailyVolume = parseInt(volumeText, 10);
 
-                if (!isNaN(dailyVolume) && dailyVolume >= VOLUME_THRESHOLD) {
-                    span.style.color = '#974ae8'; // 紫色
-                    span.style.fontWeight = 'bold'; // 加粗
+                if (!isNaN(dailyVolume)) {
+                    if (dailyVolume > HIGH_VOLUME_THRESHOLD) {
+                        span.style.color = 'rgb(160, 28, 28)'; // 红色（> 80）
+                        span.style.fontWeight = 'bold'; // 加粗
+                    } else if (dailyVolume >= VOLUME_THRESHOLD) {
+                        span.style.color = '#974ae8'; // 紫色（≥ 30）
+                        span.style.fontWeight = 'bold'; // 加粗
+                    }
                 }
             });
             return true; // 成功找到并处理元素
