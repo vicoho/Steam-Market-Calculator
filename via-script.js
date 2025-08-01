@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.35
+// @version      0.36
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho
 // @run-at       document-end
@@ -73,7 +73,7 @@
         });
 
         // --- 立即移除 min-width 逻辑（不依赖点击，不还原） ---
-        var exchangeTableDetail = document.querySelector('.exchange-table-detail[data-v-99d3c6b9]');
+        var exchangeTableDetail = document.querySelector('.exchange-table-detail');
         if (exchangeTableDetail) {
             exchangeTableDetail.style.removeProperty('min-width');
         }
