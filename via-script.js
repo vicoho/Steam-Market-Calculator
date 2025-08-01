@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.46
+// @version      0.47
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho
 // @run-at       document-end
@@ -22,7 +22,7 @@
         var targetElement3 = document.querySelector('.el-header');
         var targetElement4 = document.querySelector('.el-main');
         var targetElement5 = document.querySelector('.header-top-left');
-        var targetElement6 = document.querySelector('.exchange-table-detail[data-v-99d3c6b9]');
+        var targetElement6 = document.querySelector('.exchange-table-detail');
 
         // 定义一个状态变量，用于判断当前是“执行”状态还是“复原”状态
         var isApplied = false;
