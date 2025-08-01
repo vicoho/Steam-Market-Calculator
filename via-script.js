@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.31
+// @version      0.32
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho 
 // @run-at       document-end
@@ -31,14 +31,14 @@
         // 定义一个函数来应用样式
         function applyStyles() {
             if (targetElement1) {
-                targetElement1.style.display = 'none';
+                targetElement1.style.display = 'none', 'important';
             }
             if (targetElement2) {
                 targetElement2.style.setProperty('height', '36px', 'important');
                 targetElement2.style.setProperty('padding', '0 15px', 'important');
             }
             if (targetElement3) {
-                targetElement3.style.display = 'none';
+                targetElement3.style.display = 'none', 'important';
             }
             if (targetElement4) {
                 targetElement4.style.setProperty('margin-top', '0', 'important');
