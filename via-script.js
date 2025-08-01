@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.47
+// @version      0.5
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho
 // @run-at       document-end
@@ -22,7 +22,9 @@
         var targetElement3 = document.querySelector('.el-header');
         var targetElement4 = document.querySelector('.el-main');
         var targetElement5 = document.querySelector('.header-top-left');
-        var targetElement6 = document.querySelector('.exchange-table-detail');
+        // 新增需要修改的元素集合（所有.exchange-table-detail）
+        var targetElements6 = document.querySelectorAll('.exchange-table-detail[data-v-99d3c6b9]');
+
 
         // 定义一个状态变量，用于判断当前是“执行”状态还是“复原”状态
         var isApplied = false;
@@ -45,9 +47,10 @@
             if (targetElement5) {
                 targetElement5.style.setProperty('margin-top', '7px', 'important');
             }
-            if (targetElement6) {
-                targetElement6.style.setProperty('min-width', 'auto', 'important');
-            }
+            // 遍历所有.exchange-table-detail元素并应用样式
+            targetElements6.forEach(function(element) {
+                element.style.setProperty('min-width', 'auto', 'important');
+            });
             isApplied = true;
         }
 
@@ -69,9 +72,10 @@
             if (targetElement5) {
                 targetElement5.style.removeProperty('margin-top'); // 移除margin-top属性
             }
-            if (targetElement6) {
-                targetElement6.style.removeProperty('min-width'); // 移除min-width属性
-            }
+            // 遍历所有.exchange-table-detail元素并复原样式
+            targetElements6.forEach(function(element) {
+                element.style.removeProperty('min-width'); // 移除min-width属性
+            });
             isApplied = false;
         }
 
