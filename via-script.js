@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         挂刀页面美化 (CSS注入版)
+// @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.51
+// @version      0.52
 // @description  优化smis.club挂刀页面的显示效果，通过注入CSS实现
 // @author       vicoho
 // @run-at       document-end
@@ -36,6 +36,12 @@
             }
             .exchange-table-detail[data-v-99d3c6b9] {
                 min-width: auto !important;
+            }
+            .exchange-table-detail[data-v-99d3c6b9] > div:nth-last-child(2) {
+                display: none !important;
+            }
+            .exchange-table-detail[data-v-99d3c6b9] > div:nth-last-child(1) {
+                display: none !important;
             }
         `;
 
