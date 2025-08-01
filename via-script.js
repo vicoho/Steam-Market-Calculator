@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.22
+// @version      0.3
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho 
 // @run-at       document-end
