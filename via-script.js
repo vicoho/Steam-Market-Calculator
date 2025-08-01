@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.61
+// @version      0.62
 // @description  优化smis.club挂刀页面的显示效果，通过注入CSS实现
 // @author       vicoho
 // @run-at       document-end
@@ -84,7 +84,6 @@
         });
     });
 
-    // --- 新增功能：日成交量样式修改 ---
     // 页面加载完成后执行
     window.addEventListener('load', function () {
         // 定义常量
@@ -107,8 +106,8 @@
                     // 将文本转换为整数
                     const volume = parseInt(volumeText, 10);
 
-                    // 检查转换后的数字是否有效且大于常量定义的阈值
-                    if (!isNaN(volume) && volume > MIN_DAILY_VOLUME_THRESHOLD) {
+                    // 检查转换后的数字是否有效且大于或等于常量定义的阈值
+                    if (!isNaN(volume) && volume >= MIN_DAILY_VOLUME_THRESHOLD) { // 修改这里：从 > 改为 >=
                         // 如果条件满足，将该 span 元素的文本颜色设置为 #974ae8，并加粗
                         dailyVolumeSpan.style.color = '#974ae8';
                         dailyVolumeSpan.style.fontWeight = 'bold';
@@ -116,5 +115,9 @@
                 }
             }
         });
+        // 自动点击第一个触发器元素
+        if (triggerElements.length > 0) {
+            triggerElements[0].click(); // 模拟点击第一个触发器
+        }
     });
 })();
