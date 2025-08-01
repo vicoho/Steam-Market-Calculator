@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.4
+// @version      0.41
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho
 // @run-at       document-end
@@ -12,27 +12,63 @@
 (function () {
     // 页面加载完成后执行
     window.addEventListener('load', function () {
-        // --- 新增：加载脚本后直接修改样式 ---
+        // --- 直接修改样式：min-width: auto !important; ---
         var exchangeTableDetail = document.querySelector('.exchange-table-detail');
         if (exchangeTableDetail) {
             exchangeTableDetail.style.setProperty('min-width', 'auto', 'important');
         }
 
-        // --- 点击切换逻辑 ---
-        // 查找所有具有 'header-top-image' class 的触发器元素
-        var triggerElements = document.querySelectorAll('.header-top-image');
+        // --- 媒体查询逻辑 ---
+        // 定义媒体查询
+        var mediaQuery = window.matchMedia('(max-width: 1000px)');
 
-        // 查找需要被点击修改的元素
+        // 定义应用媒体查询样式和复原样式的函数
+        function applyMediaQueryStyles() {
+            if (exchangeTableDetail) {
+                // 在 max-width: 1000px 时，将 min-width 设置为 auto
+                exchangeTableDetail.style.setProperty('min-width', 'auto', 'important');
+                // 你可以在这里添加其他在小屏幕下需要修改的样式
+                // 例如：
+                // exchangeTableDetail.style.setProperty('width', '100%', 'important');
+            }
+        }
+
+        function revertMediaQueryStyles() {
+            if (exchangeTableDetail) {
+                // 移除 min-width 属性，恢复到 CSS 中定义的默认值或之前的样式
+                exchangeTableDetail.style.removeProperty('min-width');
+                // 移除其他你可能在 applyMediaQueryStyles 中添加的样式
+                // 例如：
+                // exchangeTableDetail.style.removeProperty('width');
+            }
+        }
+
+        // 初始检查媒体查询状态并应用样式
+        if (mediaQuery.matches) {
+            applyMediaQueryStyles();
+        } else {
+            revertMediaQueryStyles();
+        }
+
+        // 添加监听器，当媒体查询状态改变时执行
+        mediaQuery.addListener(function (mq) {
+            if (mq.matches) {
+                applyMediaQueryStyles();
+            } else {
+                revertMediaQueryStyles();
+            }
+        });
+
+
+        // --- 点击切换逻辑 (保持不变) ---
+        var triggerElements = document.querySelectorAll('.header-top-image');
         var targetElement1 = document.querySelector('.exchange-header-bottom');
         var targetElement2 = document.querySelector('.commodity-exchange-header');
         var targetElement3 = document.querySelector('.el-header');
         var targetElement4 = document.querySelector('.el-main');
         var targetElement5 = document.querySelector('.header-top-left');
-
-        // 定义一个状态变量，用于判断当前是“执行”状态还是“复原”状态
         var isApplied = false;
 
-        // 定义一个函数来应用样式
         function applyStyles() {
             if (targetElement1) {
                 targetElement1.style.display = 'none';
@@ -53,28 +89,26 @@
             isApplied = true;
         }
 
-        // 定义一个函数来复原样式
         function revertStyles() {
             if (targetElement1) {
-                targetElement1.style.display = ''; // 恢复默认display
+                targetElement1.style.display = '';
             }
             if (targetElement2) {
-                targetElement2.style.removeProperty('height'); // 移除height属性
-                targetElement2.style.removeProperty('padding'); // 移除padding属性
+                targetElement2.style.removeProperty('height');
+                targetElement2.style.removeProperty('padding');
             }
             if (targetElement3) {
-                targetElement3.style.display = ''; // 恢复默认display
+                targetElement3.style.display = '';
             }
             if (targetElement4) {
-                targetElement4.style.removeProperty('margin-top'); // 移除margin-top属性
+                targetElement4.style.removeProperty('margin-top');
             }
             if (targetElement5) {
-                targetElement5.style.removeProperty('margin-top'); // 移除margin-top属性
+                targetElement5.style.removeProperty('margin-top');
             }
             isApplied = false;
         }
 
-        // 遍历所有触发器元素，并为每个元素添加点击事件监听器
         triggerElements.forEach(function (element) {
             element.addEventListener('click', function () {
                 if (!isApplied) {
