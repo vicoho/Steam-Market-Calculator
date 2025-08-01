@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.21
+// @version      0.22
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho 
 // @run-at       document-end
@@ -9,9 +9,9 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
     // 页面加载完成后执行
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         // 查找所有具有 'header-top-image' class 的触发器元素
         // 注意：这里使用 querySelectorAll 因为可能有多个相同 class 的元素，
         // 我们会给每个都添加点击事件。
@@ -33,7 +33,8 @@
                 targetElement1.style.display = 'none';
             }
             if (targetElement2) {
-                targetElement2.style.setProperty('height', '70px', 'important');
+                targetElement2.style.setProperty('height', 'auto', 'important');
+                targetElement2.style.setProperty('padding', '0 15px', 'important');
             }
             if (targetElement3) {
                 targetElement3.style.display = 'none';
@@ -51,6 +52,7 @@
             }
             if (targetElement2) {
                 targetElement2.style.removeProperty('height'); // 移除height属性
+                targetElement2.style.removeProperty('padding'); // 移除padding属性
             }
             if (targetElement3) {
                 targetElement3.style.display = ''; // 恢复默认display
@@ -62,8 +64,8 @@
         }
 
         // 遍历所有触发器元素，并为每个元素添加点击事件监听器
-        triggerElements.forEach(function(element) {
-            element.addEventListener('click', function() {
+        triggerElements.forEach(function (element) {
+            element.addEventListener('click', function () {
                 if (!isApplied) {
                     // 首次点击：应用样式
                     applyStyles();
