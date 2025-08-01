@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.37
+// @version      0.38
 // @description  优化smis.club挂刀页面的显示效果
 // @author       vicoho
 // @run-at       document-end
@@ -12,6 +12,12 @@
 (function () {
     // 页面加载完成后执行
     window.addEventListener('load', function () {
+        // --- 新增：加载脚本后直接修改样式 ---
+        var exchangeTableDetail = document.querySelector('.exchange-table-detail');
+        if (exchangeTableDetail) {
+            exchangeTableDetail.style.setProperty('min-width', 'auto', 'important');
+        }
+
         // --- 点击切换逻辑 ---
         // 查找所有具有 'header-top-image' class 的触发器元素
         var triggerElements = document.querySelectorAll('.header-top-image');
@@ -78,17 +84,5 @@
                 }
             });
         });
-
-        // --- 立即移除 min-width 逻辑（不依赖点击，不还原） ---
-        // 查找特定元素：.exchange-table-detail[data-v-99d3c6b9]
-        // 注意：如果 data-v-属性是动态变化的，最好只使用类选择器 `.exchange-table-detail`。
-        // 如果 data-v-99d3c6b9 确实是稳定且唯一的，则保留它。
-        var exchangeTableDetail = document.querySelector('.exchange-table-detail');
-
-        // 如果找到了元素，则立即将其 min-width 设置为 0 并加上 !important
-        // 这将强制覆盖媒体查询中带有 !important 的 min-width: 180px!important;
-        if (exchangeTableDetail) {
-            exchangeTableDetail.style.setProperty('min-width', '0', 'important');
-        }
     });
 })();
