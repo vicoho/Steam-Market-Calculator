@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.77
-// @description  用于增强 smis.club 交易页面的显示效果
+// @version      0.68
+// @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
@@ -77,8 +77,14 @@
 
     // 高亮日成交量（如果满足阈值）
     const highlightDailyVolume = () => {
-        const dailyVolumeSpan = document.querySelector('div[data-v-99d3c6b9] > span[style*="color: rgb(51, 51, 51)"]');
+        // 尝试原始选择器
+        let dailyVolumeSpan = document.querySelector('div[data-v-99d3c6b9] > span[style*="color: rgb(51, 51, 51)"]');
         
+        // 如果原始选择器失败，尝试更宽松的选择器
+        if (!dailyVolumeSpan) {
+            dailyVolumeSpan = document.querySelector('div[data-v-99d3c6b9] > span');
+        }
+
         if (dailyVolumeSpan) {
             const volumeText = dailyVolumeSpan.textContent.trim();
             const dailyVolume = parseInt(volumeText, 10);
@@ -87,7 +93,9 @@
                 dailyVolumeSpan.style.color = '#974ae8'; // 紫色
                 dailyVolumeSpan.style.fontWeight = 'bold'; // 加粗
             }
+            return true; // 成功找到并处理元素
         }
+        return false; // 未找到元素
     };
 
     // 设置触发器点击事件
@@ -109,9 +117,27 @@
         }
     };
 
+    // 检测动态加载的日成交量元素
+    const observeDynamicContent = () => {
+        // 立即尝试高亮
+        if (highlightDailyVolume()) {
+            return; // 如果已成功，不再轮询
+        }
+
+        // 使用 setInterval 轮询，直到找到元素或超时
+        let attempts = 0;
+        const maxAttempts = 20; // 最多尝试 10 秒（20 x 500ms）
+        const interval = setInterval(() => {
+            attempts++;
+            if (highlightDailyVolume() || attempts >= maxAttempts) {
+                clearInterval(interval); // 成功或超时后停止轮询
+            }
+        }, 500); // 每 500ms 检查一次
+    };
+
     // 页面加载完成后执行
     window.addEventListener('load', () => {
         setupTriggerListeners();
-        highlightDailyVolume();
+        observeDynamicContent();
     });
 })();
