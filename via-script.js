@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         挂刀页面美化
+// @name         挂刀页面美化 (CSS注入版)
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.5
-// @description  优化smis.club挂刀页面的显示效果
+// @version      0.51
+// @description  优化smis.club挂刀页面的显示效果，通过注入CSS实现
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
@@ -16,66 +16,60 @@
         // 查找所有具有 'header-top-image' class 的触发器元素
         var triggerElements = document.querySelectorAll('.header-top-image');
 
-        // 查找需要被点击修改的元素
-        var targetElement1 = document.querySelector('.exchange-header-bottom');
-        var targetElement2 = document.querySelector('.commodity-exchange-header');
-        var targetElement3 = document.querySelector('.el-header');
-        var targetElement4 = document.querySelector('.el-main');
-        var targetElement5 = document.querySelector('.header-top-left');
-        // 新增需要修改的元素集合（所有.exchange-table-detail）
-        var targetElements6 = document.querySelectorAll('.exchange-table-detail[data-v-99d3c6b9]');
+        // 定义要注入的CSS样式
+        var cssStyles = `
+            .exchange-header-bottom {
+                display: none !important;
+            }
+            .commodity-exchange-header {
+                height: 36px !important;
+                padding: 0 15px !important;
+            }
+            .el-header {
+                display: none !important;
+            }
+            .el-main {
+                margin-top: 0 !important;
+            }
+            .header-top-left {
+                margin-top: 7px !important;
+            }
+            .exchange-table-detail[data-v-99d3c6b9] {
+                min-width: auto !important;
+            }
+        `;
 
+        // 创建一个style元素
+        var styleElement = document.createElement('style');
+        styleElement.id = 'smis-beautify-styles'; // 给style元素一个ID，方便后续查找和移除
+        styleElement.type = 'text/css';
+        // 兼容不同浏览器设置文本内容
+        if (styleElement.styleSheet) { // IE
+            styleElement.styleSheet.cssText = cssStyles;
+        } else { // 其他浏览器
+            styleElement.appendChild(document.createTextNode(cssStyles));
+        }
 
         // 定义一个状态变量，用于判断当前是“执行”状态还是“复原”状态
         var isApplied = false;
 
-        // 定义一个函数来应用样式
+        // 定义一个函数来应用样式 (注入CSS)
         function applyStyles() {
-            if (targetElement1) {
-                targetElement1.style.display = 'none';
+            // 确保styleElement只被添加一次
+            if (!document.getElementById('smis-beautify-styles')) {
+                document.head.appendChild(styleElement);
+                console.log('Styles applied by injecting CSS.');
             }
-            if (targetElement2) {
-                targetElement2.style.setProperty('height', '36px', 'important');
-                targetElement2.style.setProperty('padding', '0 15px', 'important');
-            }
-            if (targetElement3) {
-                targetElement3.style.display = 'none';
-            }
-            if (targetElement4) {
-                targetElement4.style.setProperty('margin-top', '0', 'important');
-            }
-            if (targetElement5) {
-                targetElement5.style.setProperty('margin-top', '7px', 'important');
-            }
-            // 遍历所有.exchange-table-detail元素并应用样式
-            targetElements6.forEach(function(element) {
-                element.style.setProperty('min-width', 'auto', 'important');
-            });
             isApplied = true;
         }
 
-        // 定义一个函数来复原样式
+        // 定义一个函数来复原样式 (移除CSS)
         function revertStyles() {
-            if (targetElement1) {
-                targetElement1.style.display = ''; // 恢复默认display
+            var existingStyle = document.getElementById('smis-beautify-styles');
+            if (existingStyle) {
+                existingStyle.parentNode.removeChild(existingStyle);
+                console.log('Styles reverted by removing injected CSS.');
             }
-            if (targetElement2) {
-                targetElement2.style.removeProperty('height'); // 移除height属性
-                targetElement2.style.removeProperty('padding'); // 移除padding属性
-            }
-            if (targetElement3) {
-                targetElement3.style.display = ''; // 恢复默认display
-            }
-            if (targetElement4) {
-                targetElement4.style.removeProperty('margin-top'); // 移除margin-top属性
-            }
-            if (targetElement5) {
-                targetElement5.style.removeProperty('margin-top'); // 移除margin-top属性
-            }
-            // 遍历所有.exchange-table-detail元素并复原样式
-            targetElements6.forEach(function(element) {
-                element.style.removeProperty('min-width'); // 移除min-width属性
-            });
             isApplied = false;
         }
 
