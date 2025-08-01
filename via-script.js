@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         挂刀页面美化
-// @namespace    https://viayoo.com/yxd9u3
-// @version      0.1
-// @description  try to take over the world!
-// @author       You
+// @namespace    https://github.com/vicoho/Steam-Market-Calculator
+// @version      0.11
+// @description  优化smis.club挂刀页面的显示效果
+// @author       vicoho 
 // @run-at       document-end
-// @match        https://smis.club/*
+// @match        https://smis.club/exchange
 // @grant        none
 // ==/UserScript==
 
