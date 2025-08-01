@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.68
+// @version      0.70
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -77,22 +77,22 @@
 
     // 高亮日成交量（如果满足阈值）
     const highlightDailyVolume = () => {
-        // 尝试原始选择器
-        let dailyVolumeSpan = document.querySelector('div[data-v-99d3c6b9] > span[style*="color: rgb(51, 51, 51)"]');
-        
-        // 如果原始选择器失败，尝试更宽松的选择器
-        if (!dailyVolumeSpan) {
-            dailyVolumeSpan = document.querySelector('div[data-v-99d3c6b9] > span');
-        }
+        // 选择 .exchange-phone-item-median 下的所有 span，并验证内容为纯数字
+        const spans = Array.from(document.querySelectorAll('.exchange-phone-item-median span')).filter(span => {
+            const text = span.textContent.trim();
+            return /^\d+$/.test(text); // 仅匹配纯数字内容
+        });
 
-        if (dailyVolumeSpan) {
-            const volumeText = dailyVolumeSpan.textContent.trim();
-            const dailyVolume = parseInt(volumeText, 10);
+        if (spans.length > 0) {
+            spans.forEach(span => {
+                const volumeText = span.textContent.trim();
+                const dailyVolume = parseInt(volumeText, 10);
 
-            if (!isNaN(dailyVolume) && dailyVolume >= VOLUME_THRESHOLD) {
-                dailyVolumeSpan.style.color = '#974ae8'; // 紫色
-                dailyVolumeSpan.style.fontWeight = 'bold'; // 加粗
-            }
+                if (!isNaN(dailyVolume) && dailyVolume >= VOLUME_THRESHOLD) {
+                    span.style.color = '#974ae8'; // 紫色
+                    span.style.fontWeight = 'bold'; // 加粗
+                }
+            });
             return true; // 成功找到并处理元素
         }
         return false; // 未找到元素
