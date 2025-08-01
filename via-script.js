@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.71
-// @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
+// @version      0.73
+// @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，根据日成交量高亮显示，并支持移动端下拉刷新
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
@@ -13,6 +13,7 @@
     // 常量定义
     const VOLUME_THRESHOLD = 30; // 日成交量阈值（紫色）
     const HIGH_VOLUME_THRESHOLD = 80; // 高成交量阈值（红色）
+    const PULL_THRESHOLD = 100; // 下拉刷新阈值（像素）
 
     // 美化页面的 CSS 样式
     const cssStyles = `
@@ -44,11 +45,34 @@
         .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(1) {
             display: none !important;
         }
+        #pull-refresh-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            line-height: 40px;
+            font-size: 16px;
+            z-index: 1000;
+            display: none;
+            transform: translateY(-100%);
+            transition: transform 0.2s;
+        }
+        #pull-refresh-indicator.visible {
+            display: block;
+            transform: translateY(0);
+        }
     `;
 
     // 状态变量和样式元素 ID
-    let isApplied = false; // 跟踪样式是否已应用
+    let isApplied = false; // 跟踪美化样式是否已应用
     const styleElementId = 'smis-beautify-styles'; // 样式元素 ID
+    let isPulling = false; // 跟踪下拉状态
+    let startY = 0; // 触摸起始 Y 坐标
+    let pullDistance = 0; // 下拉距离
 
     // 创建 CSS 样式元素
     const createStyleElement = () => {
@@ -78,7 +102,6 @@
 
     // 高亮日成交量（如果满足阈值）
     const highlightDailyVolume = () => {
-        // 选择 .exchange-phone-item-median 下的所有 span，并验证内容为纯数字
         const spans = Array.from(document.querySelectorAll('.exchange-phone-item-median span')).filter(span => {
             const text = span.textContent.trim();
             return /^\d+$/.test(text); // 仅匹配纯数字内容
@@ -125,25 +148,62 @@
 
     // 检测动态加载的日成交量元素
     const observeDynamicContent = () => {
-        // 立即尝试高亮
         if (highlightDailyVolume()) {
             return; // 如果已成功，不再轮询
         }
 
-        // 使用 setInterval 轮询，直到找到元素或超时
         let attempts = 0;
-        const maxAttempts = 20; // 最多尝试 10 秒（20 x 500ms）
+        const maxAttempts = 20; // 最多尝试 10 秒
         const interval = setInterval(() => {
             attempts++;
             if (highlightDailyVolume() || attempts >= maxAttempts) {
-                clearInterval(interval); // 成功或超时后停止轮询
+                clearInterval(interval); // 成功或超时后停止
             }
-        }, 500); // 每 500ms 检查一次
+        }, 500); // 每 500ms 检查
+    };
+
+    // 移动端下拉刷新功能
+    const setupPullToRefresh = () => {
+        // 创建下拉刷新提示元素
+        const indicator = document.createElement('div');
+        indicator.id = 'pull-refresh-indicator';
+        indicator.textContent = '下拉刷新';
+        document.body.appendChild(indicator);
+
+        // 触摸事件
+        document.addEventListener('touchstart', e => {
+            if (window.scrollY === 0) { // 仅在页面顶部触发
+                isPulling = true;
+                startY = e.touches[0].clientY;
+            }
+        });
+
+        document.addEventListener('touchmove', e => {
+            if (!isPulling) return;
+            pullDistance = e.touches[0].clientY - startY;
+            if (pullDistance > 0) {
+                e.preventDefault(); // 阻止默认滚动
+                indicator.classList.add('visible');
+                indicator.textContent = pullDistance > PULL_THRESHOLD ? '松开刷新' : '下拉刷新';
+                indicator.style.transform = `translateY(${Math.min(pullDistance, PULL_THRESHOLD)}px)`;
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            if (isPulling && pullDistance > PULL_THRESHOLD) {
+                location.reload(); // 刷新页面
+            }
+            isPulling = false;
+            pullDistance = 0;
+            indicator.classList.remove('visible');
+            indicator.style.transform = 'translateY(-100%)';
+        });
     };
 
     // 页面加载完成后执行
     window.addEventListener('load', () => {
         setupTriggerListeners();
         observeDynamicContent();
+        setupPullToRefresh();
     });
 })();
