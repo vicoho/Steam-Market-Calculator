@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.73
-// @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，根据日成交量高亮显示，并支持移动端下拉刷新
+// @version      0.74
+// @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，根据日成交量高亮显示，并支持移动端下拉刷新（仅页面顶部触发）
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
@@ -14,6 +14,7 @@
     const VOLUME_THRESHOLD = 30; // 日成交量阈值（紫色）
     const HIGH_VOLUME_THRESHOLD = 80; // 高成交量阈值（红色）
     const PULL_THRESHOLD = 100; // 下拉刷新阈值（像素）
+    const SCROLL_TOLERANCE = 5; // 页面顶部容差（像素）
 
     // 美化页面的 CSS 样式
     const cssStyles = `
@@ -172,26 +173,36 @@
 
         // 触摸事件
         document.addEventListener('touchstart', e => {
-            if (window.scrollY === 0) { // 仅在页面顶部触发
+            if (window.scrollY <= SCROLL_TOLERANCE) { // 仅在页面顶部或接近顶部触发
                 isPulling = true;
                 startY = e.touches[0].clientY;
             }
         });
 
         document.addEventListener('touchmove', e => {
-            if (!isPulling) return;
+            if (!isPulling || window.scrollY > SCROLL_TOLERANCE) {
+                isPulling = false; // 非顶部状态立即终止
+                indicator.classList.remove('visible');
+                indicator.style.transform = 'translateY(-100%)';
+                return;
+            }
+
             pullDistance = e.touches[0].clientY - startY;
             if (pullDistance > 0) {
-                e.preventDefault(); // 阻止默认滚动
+                e.preventDefault(); // 仅在有效下拉时阻止默认滚动
                 indicator.classList.add('visible');
                 indicator.textContent = pullDistance > PULL_THRESHOLD ? '松开刷新' : '下拉刷新';
                 indicator.style.transform = `translateY(${Math.min(pullDistance, PULL_THRESHOLD)}px)`;
+            } else {
+                isPulling = false; // 向上滑动时终止
+                indicator.classList.remove('visible');
+                indicator.style.transform = 'translateY(-100%)';
             }
         });
 
         document.addEventListener('touchend', () => {
-            if (isPulling && pullDistance > PULL_THRESHOLD) {
-                location.reload(); // 刷新页面
+            if (isPulling && pullDistance > PULL_THRESHOLD && window.scrollY <= SCROLL_TOLERANCE) {
+                location.reload(); // 仅在顶部且下拉足够时刷新
             }
             isPulling = false;
             pullDistance = 0;
