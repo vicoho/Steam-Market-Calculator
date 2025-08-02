@@ -91,7 +91,7 @@
 
                 if (!isNaN(dailyVolume)) {
                     if (dailyVolume > HIGH_VOLUME_THRESHOLD) {
-                        span.style.color = 'rgb(160, 28, 28)'; // 红色（> 80）
+                        span.style.color = '#a01c1c)'; // 红色（> 80）
                         span.style.fontWeight = 'bold'; // 加粗
                     } else if (dailyVolume >= VOLUME_THRESHOLD) {
                         span.style.color = '#974ae8'; // 紫色（≥ 30）
