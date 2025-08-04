@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.71
+// @version      0.72
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -37,6 +37,9 @@
         }
         .commodity-exchange-bottom {
             margin-top: 0px !important;
+        }
+        .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(3) {
+            display: none !important;
         }
         .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(2) {
             display: none !important;
@@ -76,9 +79,8 @@
         isApplied = false;
     };
 
-    // 高亮日成交量（如果满足阈值）
+    // 高亮日成交量
     const highlightDailyVolume = () => {
-        // 选择 .exchange-phone-item-median 下的所有 span，并验证内容为纯数字
         const spans = Array.from(document.querySelectorAll('.exchange-phone-item-median span')).filter(span => {
             const text = span.textContent.trim();
             return /^\d+$/.test(text); // 仅匹配纯数字内容
@@ -91,7 +93,7 @@
 
                 if (!isNaN(dailyVolume)) {
                     if (dailyVolume > HIGH_VOLUME_THRESHOLD) {
-                        span.style.color = '#a01c1c)'; // 红色（> 80）
+                        span.style.color = 'rgb(160, 28, 28)'; // 红色（> 80）
                         span.style.fontWeight = 'bold'; // 加粗
                     } else if (dailyVolume >= VOLUME_THRESHOLD) {
                         span.style.color = '#974ae8'; // 紫色（≥ 30）
@@ -123,22 +125,36 @@
         }
     };
 
-    // 检测动态加载的日成交量元素
+    // 使用 MutationObserver 监听动态加载的内容
     const observeDynamicContent = () => {
         // 立即尝试高亮
-        if (highlightDailyVolume()) {
-            return; // 如果已成功，不再轮询
+        highlightDailyVolume();
+
+        // 监听“应用设置”按钮点击
+        const applyButton = document.querySelector('.header-top-right button:last-child');
+        if (applyButton) {
+            applyButton.addEventListener('click', () => {
+                // 延迟执行高亮，等待新内容加载
+                setTimeout(highlightDailyVolume, 500);
+            });
         }
 
-        // 使用 setInterval 轮询，直到找到元素或超时
-        let attempts = 0;
-        const maxAttempts = 20; // 最多尝试 10 秒（20 x 500ms）
-        const interval = setInterval(() => {
-            attempts++;
-            if (highlightDailyVolume() || attempts >= maxAttempts) {
-                clearInterval(interval); // 成功或超时后停止轮询
+        // 使用 MutationObserver 监听 DOM 变化
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length > 0) {
+                    // 检测到新节点添加，尝试高亮
+                    highlightDailyVolume();
+                }
             }
-        }, 500); // 每 500ms 检查一次
+        });
+
+        // 监听 .exchange-phone-item-median 的父容器（假设为 .el-main 或 body）
+        const targetNode = document.querySelector('.el-main') || document.body;
+        observer.observe(targetNode, {
+            childList: true,
+            subtree: true
+        });
     };
 
     // 页面加载完成后执行
