@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.72
+// @version      0.73
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -49,11 +49,36 @@
         }
     `;
 
+    // 点击事件触发的额外 CSS 样式
+    const clickCssStyles = `
+        .commodity-exchange-header {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            margin: 0 !important;
+            box-sizing: border-box;
+            z-index: 99;
+        }
+        .header-top-right {
+            width: 100% !important;
+        }
+        .header-top-right button:nth-child(1) {
+            display: none !important;
+        }
+        .header-top-right button:nth-child(2) {
+            display: none !important;
+        }
+        .header-top-right button:nth-child(3) {
+            width: 100% !important;
+        }
+    `;
+
     // 状态变量和样式元素 ID
     let isApplied = false; // 跟踪样式是否已应用
-    const styleElementId = 'smis-beautify-styles'; // 样式元素 ID
+    const styleElementId = 'smis-beautify-styles'; // 基础样式元素 ID
+    const clickStyleElementId = 'smis-beautify-click-styles'; // 点击样式元素 ID
 
-    // 创建 CSS 样式元素
+    // 创建基础 CSS 样式元素
     const createStyleElement = () => {
         const style = document.createElement('style');
         style.id = styleElementId;
@@ -62,19 +87,35 @@
         return style;
     };
 
-    // 应用美化样式
+    // 创建点击触发的 CSS 样式元素
+    const createClickStyleElement = () => {
+        const style = document.createElement('style');
+        style.id = clickStyleElementId;
+        style.type = 'text/css';
+        style.textContent = clickCssStyles;
+        return style;
+    };
+
+    // 应用美化样式（包括基础和点击样式）
     const applyStyles = () => {
         if (!document.getElementById(styleElementId)) {
             document.head.appendChild(createStyleElement());
         }
+        if (!document.getElementById(clickStyleElementId)) {
+            document.head.appendChild(createClickStyleElement());
+        }
         isApplied = true;
     };
 
-    // 移除美化样式
+    // 移除美化样式（包括基础和点击样式）
     const revertStyles = () => {
         const existingStyle = document.getElementById(styleElementId);
+        const existingClickStyle = document.getElementById(clickStyleElementId);
         if (existingStyle) {
             existingStyle.remove();
+        }
+        if (existingClickStyle) {
+            existingClickStyle.remove();
         }
         isApplied = false;
     };
@@ -149,7 +190,7 @@
             }
         });
 
-        // 监听 .exchange-phone-item-median 的父容器（假设为 .el-main 或 body）
+        // 监听 .el-main 的父容器（假设为 .el-main 或 body）
         const targetNode = document.querySelector('.el-main') || document.body;
         observer.observe(targetNode, {
             childList: true,
