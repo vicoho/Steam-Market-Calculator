@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>挂刀计算器</title>
+    <!-- 引入外部样式表 -->
+    <link rel="stylesheet" href="index-style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- 第一列 -->
+        <div class="column">
+            <div class="input-row">
+                <span class="input-label">购入</span>
+                <div class="input-wrapper">
+                    <input type="number" id="inputA" step="0.01" min="0">
+                    <div class="btn-group">
+                        <button class="btn btn-reset" tabindex="-1">重置</button>
+                        <button class="btn" tabindex="-1" data-target="inputA" data-delta="-0.01">-</button>
+                        <button class="btn" tabindex="-1" data-target="inputA" data-delta="0.01">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <span class="input-label">卖出</span>
+                <div class="input-wrapper">
+                    <input type="number" id="inputB" step="0.01" min="0">
+                    <div class="btn-group">
+                        <button class="btn btn-reset" tabindex="-1">重置</button>
+                        <button class="btn" tabindex="-1" data-target="inputB" data-delta="-0.01">-</button>
+                        <button class="btn" tabindex="-1" data-target="inputB" data-delta="0.01">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-group">
+                <div class="input-row">
+                    <span class="input-label">折扣</span>
+                    <input type="text" tabindex="-1" id="resultC" readonly>
+                </div>
+                <div class="input-row">
+                    <span class="input-label">余额</span>
+                    <input type="text" tabindex="-1" id="resultX" readonly>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <span class="input-label">到手</span>
+                <div class="input-wrapper">
+                    <input type="number" id="inputE" step="0.01" min="0">
+                    <div class="btn-group">
+                        <button class="btn btn-reset" tabindex="-1">重置</button>
+                        <button class="btn" tabindex="-1" data-target="inputE" data-delta="-0.01">-</button>
+                        <button class="btn" tabindex="-1" data-target="inputE" data-delta="0.01">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-group">
+                <div class="input-row">
+                    <span class="input-label">折扣</span>
+                    <input type="text" tabindex="-1" id="resultF" readonly>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- 引入外部脚本 -->
+    <script src="index-script.js"></script>
+</body>
+
+</html>

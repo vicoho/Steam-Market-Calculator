@@ -1,10 +1,10 @@
 {
     "manifest_version": 3,
     "name": "挂刀计算器",
-    "version": "1.0",
+    "version": "1.12",
     "description": "简单的挂刀计算工具",
     "action": {
-        "default_popup": "挂刀计算器.html"
+        "default_popup": "index.html"
     },
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
