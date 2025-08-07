@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      1.00
+// @version      1.01
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -29,6 +29,11 @@
         .el-main {
             margin-top: 0 !important;
             padding: 0 !important;
+        }
+        @media (max-width: 1000px) {
+            .main[data-v-54ea84d4] {
+                padding: 0 !important;
+            }
         }
         .header-top-left {
             margin-top: 7px !important;
