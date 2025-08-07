@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.77
+// @version      0.90
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -45,16 +45,19 @@
         .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(1) {
             display: none !important;
         }
-        .copy-icon {
+        .exchange-phone-item-header > div:last-child {
             cursor: pointer;
-            margin-left: 5px;
-            vertical-align: middle;
+            display: inline-block;
             width: 16px;
             height: 16px;
-            fill: #666;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center;
+            background-size: contain;
+            vertical-align: middle;
+            margin-left: 5px;
         }
-        .copy-icon:hover {
-            fill: #000;
+        .exchange-phone-item-header > div:last-child:hover {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23000"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center;
+            background-size: contain;
         }
     `;
 
@@ -156,40 +159,34 @@
         return false; // 未找到元素
     };
 
-    // 添加复制图标并绑定复制功能
-    const addCopyIcons = () => {
-        const nameElements = document.querySelectorAll('.exchange-phone-item-name');
-        nameElements.forEach(element => {
-            // 避免重复添加图标
-            if (element.querySelector('.copy-icon')) return;
+    // 添加复制功能到同级 div
+    const addCopyFunction = () => {
+        const headers = document.querySelectorAll('.exchange-phone-item-header');
+        headers.forEach(header => {
+            const nameElement = header.querySelector('.exchange-phone-item-name');
+            const copyDiv = header.querySelector('div:last-child');
+            if (!nameElement || !copyDiv || copyDiv.dataset.copyEnabled) return;
 
-            // 创建 SVG 复制图标
-            const copyIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            copyIcon.setAttribute('class', 'copy-icon');
-            copyIcon.setAttribute('viewBox', '0 0 24 24');
-            copyIcon.innerHTML = `
-                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-            `;
+            // 标记已添加事件，避免重复绑定
+            copyDiv.dataset.copyEnabled = 'true';
 
             // 添加点击事件以复制商品名称（去除编号部分）
-            copyIcon.addEventListener('click', (event) => {
+            copyDiv.addEventListener('click', (event) => {
                 event.stopPropagation(); // 阻止事件冒泡，避免触发父元素的超链接
-                const text = element.textContent.trim();
+                const text = nameElement.textContent.trim();
                 const itemName = text.includes('.') ? text.split('.').slice(1).join('.').trim() : text;
                 navigator.clipboard.writeText(itemName).then(() => {
                     // 复制成功提示
-                    const originalColor = copyIcon.style.fill;
-                    copyIcon.style.fill = '#28a745'; // 绿色提示
+                    copyDiv.style.background = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2328a745"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center`;
+                    copyDiv.style.backgroundSize = 'contain';
                     setTimeout(() => {
-                        copyIcon.style.fill = originalColor; // 恢复原色
+                        copyDiv.style.background = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center`;
+                        copyDiv.style.backgroundSize = 'contain';
                     }, 1000);
                 }).catch(err => {
                     console.error('复制失败:', err);
                 });
             });
-
-            // 将图标添加到名称后面
-            element.appendChild(copyIcon);
         });
     };
 
@@ -214,18 +211,18 @@
 
     // 使用 MutationObserver 监听动态加载的内容
     const observeDynamicContent = () => {
-        // 立即尝试高亮和添加复制图标
+        // 立即尝试高亮和添加复制功能
         highlightDailyVolume();
-        addCopyIcons();
+        addCopyFunction();
 
         // 监听“应用设置”按钮点击
         const applyButton = document.querySelector('.header-top-right button:last-child');
         if (applyButton) {
             applyButton.addEventListener('click', () => {
-                // 延迟执行高亮和添加复制图标，等待新内容加载
+                // 延迟执行高亮和添加复制功能，等待新内容加载
                 setTimeout(() => {
                     highlightDailyVolume();
-                    addCopyIcons();
+                    addCopyFunction();
                 }, 500);
             });
         }
@@ -234,9 +231,9 @@
         const observer = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
                 if (mutation.addedNodes.length > 0) {
-                    // 检测到新节点添加，尝试高亮和添加复制图标
+                    // 检测到新节点添加，尝试高亮和添加复制功能
                     highlightDailyVolume();
-                    addCopyIcons();
+                    addCopyFunction();
                 }
             }
         });
