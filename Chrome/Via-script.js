@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.73
+// @version      0.74
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
@@ -11,8 +11,8 @@
 
 (function () {
     // 常量定义
-    const VOLUME_THRESHOLD = 30; // 日成交量阈值（紫色）
-    const HIGH_VOLUME_THRESHOLD = 80; // 高成交量阈值（红色）
+    const VOLUME_THRESHOLD = 80; // 日成交量阈值（紫色）
+    const HIGH_VOLUME_THRESHOLD = 120; // 高成交量阈值（红色）
 
     // 美化页面的 CSS 样式
     const cssStyles = `
@@ -37,9 +37,6 @@
         }
         .commodity-exchange-bottom {
             margin-top: 0px !important;
-        }
-        .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(3) {
-            display: none !important;
         }
         .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(2) {
             display: none !important;

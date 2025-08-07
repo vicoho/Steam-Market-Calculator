@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         挂刀页面美化-PC
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.10
+// @version      0.11
 // @description  优化 smis.club 电脑端挂刀页面的显示效果
 // @author       vicoho
 // @run-at       document-end
@@ -13,8 +13,8 @@
 (function() {
     'use strict';
 
-    const VOLUME_THRESHOLD = 30; // 日成交量阈值（紫色）
-    const HIGH_VOLUME_THRESHOLD = 80; // 高成交量阈值（红色）
+    const VOLUME_THRESHOLD = 80; // 日成交量阈值（紫色）
+    const HIGH_VOLUME_THRESHOLD = 120; // 高成交量阈值（红色）
     const PURPLE_COLOR = '#974ae8'; // 紫色
     const RED_COLOR = '#ff0303'; // 红色
 
