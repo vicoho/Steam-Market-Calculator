@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.90
+// @version      0.99
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
 // @grant        none
 // ==/UserScript==
+
 
 (function () {
     // 常量定义
@@ -47,17 +48,6 @@
         }
         .exchange-phone-item-header > div:last-child {
             cursor: pointer;
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center;
-            background-size: contain;
-            vertical-align: middle;
-            margin-left: 5px;
-        }
-        .exchange-phone-item-header > div:last-child:hover {
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23000"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center;
-            background-size: contain;
         }
     `;
 
@@ -170,18 +160,18 @@
             // 标记已添加事件，避免重复绑定
             copyDiv.dataset.copyEnabled = 'true';
 
+            // 记录原始背景色
+            const originalBackground = copyDiv.style.background || getComputedStyle(copyDiv).background;
+
             // 添加点击事件以复制商品名称（去除编号部分）
-            copyDiv.addEventListener('click', (event) => {
-                event.stopPropagation(); // 阻止事件冒泡，避免触发父元素的超链接
+            copyDiv.addEventListener('click', () => {
                 const text = nameElement.textContent.trim();
                 const itemName = text.includes('.') ? text.split('.').slice(1).join('.').trim() : text;
                 navigator.clipboard.writeText(itemName).then(() => {
-                    // 复制成功提示
-                    copyDiv.style.background = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2328a745"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center`;
-                    copyDiv.style.backgroundSize = 'contain';
+                    // 复制成功提示：设置绿色背景
+                    copyDiv.style.background = '#28a745';
                     setTimeout(() => {
-                        copyDiv.style.background = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>') no-repeat center`;
-                        copyDiv.style.backgroundSize = 'contain';
+                        copyDiv.style.background = originalBackground; // 恢复原背景
                     }, 1000);
                 }).catch(err => {
                     console.error('复制失败:', err);
