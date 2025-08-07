@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.76
+// @version      0.77
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
 // @grant        none
 // ==/UserScript==
+
 (function () {
     // 常量定义
     const VOLUME_THRESHOLD = 80; // 日成交量阈值（紫色）
@@ -171,7 +172,8 @@
             `;
 
             // 添加点击事件以复制商品名称（去除编号部分）
-            copyIcon.addEventListener('click', () => {
+            copyIcon.addEventListener('click', (event) => {
+                event.stopPropagation(); // 阻止事件冒泡，避免触发父元素的超链接
                 const text = element.textContent.trim();
                 const itemName = text.includes('.') ? text.split('.').slice(1).join('.').trim() : text;
                 navigator.clipboard.writeText(itemName).then(() => {
