@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         挂刀页面美化
 // @namespace    https://github.com/vicoho/Steam-Market-Calculator
-// @version      0.74
+// @version      0.76
 // @description  优化 smis.club 挂刀页面的显示效果，通过注入 CSS 实现，并根据日成交量高亮显示
 // @author       vicoho
 // @run-at       document-end
 // @match        https://smis.club/exchange
 // @grant        none
 // ==/UserScript==
-
 (function () {
     // 常量定义
     const VOLUME_THRESHOLD = 80; // 日成交量阈值（紫色）
@@ -28,6 +27,7 @@
         }
         .el-main {
             margin-top: 0 !important;
+            padding: 0 !important;
         }
         .header-top-left {
             margin-top: 7px !important;
@@ -43,6 +43,17 @@
         }
         .exchange-phone-item-bottom + div > .exchange-table-detail:nth-last-child(1) {
             display: none !important;
+        }
+        .copy-icon {
+            cursor: pointer;
+            margin-left: 5px;
+            vertical-align: middle;
+            width: 16px;
+            height: 16px;
+            fill: #666;
+        }
+        .copy-icon:hover {
+            fill: #000;
         }
     `;
 
@@ -144,6 +155,42 @@
         return false; // 未找到元素
     };
 
+    // 添加复制图标并绑定复制功能
+    const addCopyIcons = () => {
+        const nameElements = document.querySelectorAll('.exchange-phone-item-name');
+        nameElements.forEach(element => {
+            // 避免重复添加图标
+            if (element.querySelector('.copy-icon')) return;
+
+            // 创建 SVG 复制图标
+            const copyIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            copyIcon.setAttribute('class', 'copy-icon');
+            copyIcon.setAttribute('viewBox', '0 0 24 24');
+            copyIcon.innerHTML = `
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+            `;
+
+            // 添加点击事件以复制商品名称（去除编号部分）
+            copyIcon.addEventListener('click', () => {
+                const text = element.textContent.trim();
+                const itemName = text.includes('.') ? text.split('.').slice(1).join('.').trim() : text;
+                navigator.clipboard.writeText(itemName).then(() => {
+                    // 复制成功提示
+                    const originalColor = copyIcon.style.fill;
+                    copyIcon.style.fill = '#28a745'; // 绿色提示
+                    setTimeout(() => {
+                        copyIcon.style.fill = originalColor; // 恢复原色
+                    }, 1000);
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                });
+            });
+
+            // 将图标添加到名称后面
+            element.appendChild(copyIcon);
+        });
+    };
+
     // 设置触发器点击事件
     const setupTriggerListeners = () => {
         const triggerElements = document.querySelectorAll('.header-top-image');
@@ -165,15 +212,19 @@
 
     // 使用 MutationObserver 监听动态加载的内容
     const observeDynamicContent = () => {
-        // 立即尝试高亮
+        // 立即尝试高亮和添加复制图标
         highlightDailyVolume();
+        addCopyIcons();
 
         // 监听“应用设置”按钮点击
         const applyButton = document.querySelector('.header-top-right button:last-child');
         if (applyButton) {
             applyButton.addEventListener('click', () => {
-                // 延迟执行高亮，等待新内容加载
-                setTimeout(highlightDailyVolume, 500);
+                // 延迟执行高亮和添加复制图标，等待新内容加载
+                setTimeout(() => {
+                    highlightDailyVolume();
+                    addCopyIcons();
+                }, 500);
             });
         }
 
@@ -181,8 +232,9 @@
         const observer = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
                 if (mutation.addedNodes.length > 0) {
-                    // 检测到新节点添加，尝试高亮
+                    // 检测到新节点添加，尝试高亮和添加复制图标
                     highlightDailyVolume();
+                    addCopyIcons();
                 }
             }
         });
